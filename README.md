@@ -21,14 +21,16 @@ Ouvrir `dist/index.html` dans le navigateur, ou `index.html` après la préparat
 
 ## Publier sur GitHub Pages
 
+Le dépôt est `i-love-my-tutus/i-love-my-tutus.github.io` et le site est servi directement à la racine de `https://i-love-my-tutus.github.io/`, sans préfixe de dossier.
+
 Une seule méthode est conservée : la publication automatique GitHub Pages depuis **`main` → `/ (root)`**. Le réglage distant existant est `build_type: legacy`, avec cette branche et ce dossier. Cette méthode fonctionne sans accès administrateur pour changer les réglages. Le workflow personnalisé `.github/workflows/pages.yml`, qui échouait volontairement avant l’heure, est supprimé ; aucun deuxième workflow de publication n’est ajouté.
 
 1. Après une modification des sources, lancer `npm.cmd run build` puis `npm.cmd test` localement.
 2. Committer les changements **avec `assets/content.js`, `assets/photos/`, la musique et les polices**. Ces fichiers générés sont désormais suivis par Git ; `dist/` reste ignoré.
 3. Pousser sur `main`. GitHub lance automatiquement **pages build and deployment** pour publier la racine du dépôt. Le fichier `.nojekyll` permet de servir les fichiers statiques tels quels.
-4. Consulter `https://i-love-my-tutus.github.io/i-love-my-tutus/`. Cette adresse est publique ; avant l’heure, elle montre le compte à rebours.
+4. Consulter `https://i-love-my-tutus.github.io/`. Cette adresse est publique ; avant l’heure, elle montre le compte à rebours.
 
-La publication peut réussir **avant l’heure** : le verrou est géré par le navigateur. Aucun job ne doit attendre le 8 octobre ou échouer à cause de la date. Les anciens runs du workflow supprimé peuvent rester visibles dans l’historique d’Actions, mais ne se déclenchent plus sur les prochains pushs. Ne pas réintroduire un workflow `deploy-pages` en parallèle de la publication depuis la branche. Tous les chemins restent relatifs et sont testés sous **`/i-love-my-tutus/`**, y compris les images, la musique, la police et le script de contenu. Pour un autre hébergement, envoyer seulement le contenu de `dist/`.
+La publication peut réussir **avant l’heure** : le verrou est géré par le navigateur. Aucun job ne doit attendre le 8 octobre ou échouer à cause de la date. Les anciens runs du workflow supprimé peuvent rester visibles dans l’historique d’Actions, mais ne se déclenchent plus sur les prochains pushs. Ne pas réintroduire un workflow `deploy-pages` en parallèle de la publication depuis la branche. Tous les chemins restent relatifs et sont testés sous **`/`**, y compris les images, la musique, la police et le script de contenu. Pour un autre hébergement, envoyer seulement le contenu de `dist/`.
 
 ## Ouverture et confidentialité
 
@@ -51,5 +53,5 @@ Les textes et photos ne sont envoyés à aucune API par les scripts. Le workflow
 
 `npm test` vérifie les bornes de l’ouverture, les fuseaux, le décompte, le mode aperçu limité aux adresses locales, les deux messages intégraux UTF-8 et leurs paragraphes, les clés de traduction, l’inventaire des photos, les chemins relatifs, la copie fidèle du MP3, l’absence d’EXIF dans les JPEG optimisés, la correspondance entre les sources et `dist` et l’absence de workflow de publication concurrent.
 
-`npm run test:browser` vérifie dans Edge sous Windows : teaser seul avant l’heure dans trois fuseaux ; aucune requête de contenu, photo ou musique avant l’heure ; ouverture automatique avec horloge simulée, sans rechargement ; chemins sous `/i-love-my-tutus/` ; choix obligatoires à chaque ouverture ; silence avant accord ; français/turc intégraux ; police locale ; vrai MP3, fondu et pause ; relecture ; décodage des 21 images ; largeurs 320, 375, 430, 768 et 1440 px ; texte à 200 % ; clavier/focus ; reduced-motion ; photo manquante et récupération après un échec de chargement. Le design et les animations existants sont conservés.
+`npm run test:browser` vérifie dans Edge sous Windows : teaser seul avant l’heure dans trois fuseaux ; aucune requête de contenu, photo ou musique avant l’heure ; ouverture automatique avec horloge simulée, sans rechargement ; chemins sous `/` ; choix obligatoires à chaque ouverture ; silence avant accord ; français/turc intégraux ; police locale ; vrai MP3, fondu et pause ; relecture ; décodage des 21 images ; largeurs 320, 375, 430, 768 et 1440 px ; texte à 200 % ; clavier/focus ; reduced-motion ; photo manquante et récupération après un échec de chargement. Le design et les animations existants sont conservés.
 # i-love-my-tutus

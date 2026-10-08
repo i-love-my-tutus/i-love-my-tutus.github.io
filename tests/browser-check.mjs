@@ -8,7 +8,7 @@ const root=path.resolve('.');
 const requestedPaths=[];
 const server=http.createServer(async(req,res)=>{
  try{
-  const prefix='/i-love-my-tutus/';const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+  const prefix='/';const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
   requestedPaths.push(pathname);
   if(!pathname.startsWith(prefix))throw Error('Chemin inconnu');
   const file=path.resolve(root,pathname.slice(prefix.length)||'index.html');
@@ -42,7 +42,7 @@ try{
    return audio;
   };
  `});
- const url=`http://127.0.0.1:${server.address().port}/i-love-my-tutus/`;
+ const url=`http://127.0.0.1:${server.address().port}/`;
  const waitFor=async(expression,label)=>{for(let i=0;i<80;i++){if(await evaluate(expression))return;await new Promise(r=>setTimeout(r,100));}const audioState=await evaluate('window.__testAudio ? {paused:__testAudio.paused,volume:__testAudio.volume,time:__testAudio.currentTime,ready:__testAudio.readyState,error:__testAudio.error?.code,visibility:document.visibilityState} : null');assert.fail(`${label}: ${JSON.stringify(audioState)}`);};
  const choose=async(language,sound)=>{
   await evaluate(`document.querySelector('input[name="language"][value="${language}"]').click();document.querySelector('input[name="sound"][value="${sound}"]').click();document.getElementById('start').click()`);
@@ -189,5 +189,5 @@ try{
  await waitFor('document.getElementById("welcome") && !document.getElementById("welcome").hidden && document.getElementById("experience").hidden','Choix après retour depuis le cache');
  assert.equal(await evaluate('document.querySelectorAll("#welcome-form input:checked").length'),0,'Choix remis à zéro');
  assert.equal(exceptions.length,0,JSON.stringify(exceptions));
- console.log('Edge : teaser seul avant 20:59 UTC, 3 fuseaux, zéro requête privée avant l’heure, ouverture automatique sans rechargement, /i-love-my-tutus/, choix français/turc et musique, police/MP3/21 images, 5 largeurs, zoom 200 %, clavier/focus, erreurs/réessai, zéro exception : OK.');
+ console.log('Edge : teaser seul avant 20:59 UTC, 3 fuseaux, zéro requête privée avant l’heure, ouverture automatique sans rechargement, /, choix français/turc et musique, police/MP3/21 images, 5 largeurs, zoom 200 %, clavier/focus, erreurs/réessai, zéro exception : OK.');
 }finally{socket?.close();browser.kill();server.closeAllConnections();server.close();}

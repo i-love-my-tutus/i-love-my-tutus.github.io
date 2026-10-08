@@ -33,7 +33,7 @@ test('Contenu intégral, caractères et chemins des photos',async()=>{
   for(const photo of content.photos[group]){assert.ok(photo.width>0&&photo.height>0);await fs.access(photo.src);for(const variant of photo.srcset.split(', '))await fs.access(variant.split(' ')[0]);}
  }
 });
-test('HTML autonome et chemins compatibles sous-répertoire GitHub Pages',async()=>{
+test('HTML autonome et chemins compatibles avec la racine GitHub Pages',async()=>{
  const html=await fs.readFile('index.html','utf8');
  for(const [,url] of html.matchAll(/(?:src|href)="([^"]+)"/g))if(!url.startsWith('#')){assert.ok(!url.startsWith('/'));await fs.access(url);}
  assert.ok(!html.includes('assets/content.js'));

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+ <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#10091f"><meta name="robots" content="noindex,nofollow">
+ <meta name="description" content="Une lettre sous les étoiles, juste pour toi."><title>Juste pour toi, ma Tütüş</title>
+ <link rel="icon" href="favicon.svg"><link rel="stylesheet" href="style.css">
+ <script defer src="i18n.js"></script><script defer src="app.js"></script>
+</head>
+<body>
+ <div class="sky" aria-hidden="true"><div class="nebula"></div><div id="stars"></div><span class="shooting-star"></span></div>
+ <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+ <a class="skip" href="#letter" hidden data-i18n="skip">Aller au message</a>
+ <section id="welcome" class="welcome full-screen" aria-labelledby="welcome-title">
+  <span class="little-star" aria-hidden="true">✧</span>
+  <span class="eyebrow" data-i18n="welcomeEyebrow">POUR TOI / SENİN İÇİN</span>
+  <h1 id="welcome-title" data-i18n="welcomeTitle">Avant de commencer…<br><span lang="tr">Başlamadan önce…</span></h1>
+  <p data-i18n="welcomeNote">Une lettre, juste pour toi. / Sadece senin için bir mektup.</p>
+  <form id="welcome-form" class="welcome-form" autocomplete="off">
+   <fieldset><legend data-i18n="languageQuestion">Ta lettre en français ou en turc ?<br><span lang="tr">Mektubunu hangi dilde okumak istersin?</span></legend>
+    <div class="choice-grid">
+     <label class="choice"><input type="radio" name="language" value="fr" required><span lang="fr">Français</span></label>
+     <label class="choice"><input type="radio" name="language" value="tr" required><span lang="tr">Türkçe</span></label>
+    </div>
+   </fieldset>
+   <fieldset><legend data-i18n="musicQuestion">Veux-tu écouter la musique ?<br><span lang="tr">Müzik dinlemek ister misin?</span></legend>
+    <div class="choice-grid">
+     <label class="choice"><input id="music-yes" type="radio" name="sound" value="on" required><span><b aria-hidden="true">♫</b> <span data-i18n="musicYes">Avec musique / Müzikle</span></span></label>
+     <label class="choice"><input type="radio" name="sound" value="off" required><span><b aria-hidden="true">◌</b> <span data-i18n="musicNo">Sans musique / Müziksiz</span></span></label>
+    </div>
+   </fieldset>
+   <button id="start" type="submit" class="primary welcome-start" data-i18n="start">Continuer / Devam et ♡</button>
+  </form>
+  <p id="welcome-status" class="small" role="status" hidden></p>
+ </section>
+ <section id="gate" class="gate full-screen" hidden aria-labelledby="gate-title">
+  <span class="eyebrow" data-i18n="gateEyebrow">UNE SURPRISE SOUS LES ÉTOILES</span><span class="little-star" aria-hidden="true">✧</span>
+  <h1 id="gate-title" data-i18n-lines="gateTitle">Quelque chose de spécial<br><em>t’attend…</em></h1>
+  <p data-i18n-lines="gateText">Il y a quelque chose que je voulais te dire…<br>Mais pas tout de suite. ♡</p>
+  <div id="countdown" class="countdown" role="timer" data-i18n-aria="countdownLabel" aria-label="Temps restant avant la surprise"></div>
+  <p class="small" data-i18n="opening">Ouverture à 23:59, heure de Bulgarie</p><p id="load-status" hidden></p>
+ </section>
+ <main id="experience" hidden>
+  <header class="masthead"><a href="#intro" data-i18n-lines="brand">pour toi, <em>Tütüş</em></a><span class="small" data-i18n="masthead">UNE LETTRE SOUS LES ÉTOILES</span></header>
+  <section id="intro" class="intro full-screen"><span class="eyebrow" data-i18n="introEyebrow">JUSTE POUR TOI, MA TÜTÜŞ</span><h1 id="intro-title" tabindex="-1" data-i18n-lines="introTitle">Il y a des mots<br>qui attendent<br><em>leur moment.</em></h1><p id="intro-excerpt" class="intro-excerpt"></p><button id="begin" class="primary" data-i18n="begin">Découvrir ce que j’ai gardé pour toi ♡</button><span class="scroll-hint"><span data-i18n="scroll">Fais défiler doucement</span><span aria-hidden="true">↓</span></span></section>
+  <section id="mystery" class="mystery" data-i18n-aria="mysteryLabel" aria-label="Le mystère et la réponse"><div class="chapter-mark">01 <span data-i18n="chapterOne">LE MOMENT QUE J’ATTENDAIS</span></div><div id="story-lines"></div></section>
+  <section id="portraits" class="gallery-section"><div class="section-heading reveal"><span class="eyebrow" data-i18n="portraitChapter">02 / ELLE</span><h2 data-i18n-lines="portraitTitle">À travers<br><em>mes yeux.</em></h2><p id="portrait-excerpt"></p></div><div id="portrait-gallery" class="portraits"></div></section>
+  <section id="together" class="gallery-section together-section"><div class="section-heading reveal"><span class="eyebrow" data-i18n="togetherChapter">03 / NOUS</span><h2 data-i18n-lines="togetherTitle">Deux cœurs.<br><em>Une histoire.</em></h2><p id="together-excerpt"></p></div><div id="together-gallery" class="memories"></div></section>
+  <section id="letter" class="letter-section"><div class="section-heading reveal"><span class="eyebrow" data-i18n="letterChapter">04 / TOUS MES MOTS, POUR TOI</span><h2 data-i18n-lines="letterTitle">Ce que je veux<br><em>vraiment te dire.</em></h2><button id="reading" class="text-button" aria-pressed="false" data-i18n="readingOn">Lire tout le message sans animations</button></div><article id="letter-content" class="letter" data-i18n-aria="letterLabel" aria-label="Mon message intégral"></article><span class="letter-end" aria-hidden="true">♡</span></section>
+  <section id="final" class="final full-screen"><span class="eyebrow" data-i18n="finalChapter">05 / ET TOUTES LES ÉTOILES AVEC NOUS</span><div id="heart" class="constellation" aria-hidden="true"></div><h2 data-i18n-lines="finalTitle">Joyeux anniversaire,<br><em>mon amour.</em></h2><p class="birthday" data-i18n="birthday">Joyeux anniversaire, ma Tütüş</p><div id="final-photo"></div><button id="last" class="primary surprise-button" aria-expanded="false" aria-controls="last-words" data-i18n="last">Une dernière chose…</button><p id="last-words" hidden></p><button id="replay" class="primary" data-i18n="replay">Revoir notre histoire ♡</button><footer data-i18n="footer">Juste pour toi. Toujours avec amour.</footer></section>
+ </main>
+ <button id="music" class="music" hidden data-i18n-aria="musicPlay" aria-label="Activer la musique" aria-pressed="false">♫ <span data-i18n="musicPaused">Musique : coupée</span></button>
+ <dialog id="lightbox" data-i18n-aria="photoDialog" aria-label="Photo agrandie"><button id="close-photo" class="close-photo" data-i18n-aria="closePhoto" aria-label="Fermer la photo">×</button><img id="large-photo" alt=""><p data-i18n="photoHint">Échap ou toucher le fond pour fermer</p></dialog>
+ <noscript><p class="noscript">Active JavaScript pour lire ta lettre. / Mektubunu okumak için JavaScript’i etkinleştir.</p></noscript>
+</body>
+</html>

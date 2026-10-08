@@ -7,14 +7,17 @@
   return [Math.floor(seconds/86400),Math.floor(seconds/3600)%24,Math.floor(seconds/60)%60,seconds%60];
  }
  function paragraphs(text) { return text.split(/(?:\r?\n){2,}/).filter(p=>p.trim().length); }
- const core = { UNLOCK_AT, countdown, paragraphs, isUnlocked: now => now >= UNLOCK_AT };
+ function isLocalPreview(hostname,search){return ['localhost','127.0.0.1','[::1]',''].includes(hostname)&&new URLSearchParams(search).get('preview')==='true';}
+ const core = { UNLOCK_AT, countdown, paragraphs, isUnlocked: now => now >= UNLOCK_AT, isLocalPreview };
  global.BirthdayCore = core;
  if (typeof document === 'undefined') return;
  const $ = id => document.getElementById(id);
  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
- const local = ['localhost','127.0.0.1','[::1]',''].includes(location.hostname);
  // Preview exclusivement local : aucun paramètre ne peut contourner le gate sur GitHub Pages.
- const preview = local && new URLSearchParams(location.search).get('preview') === 'true';
+ const preview = isLocalPreview(location.hostname,location.search);
+ const canOpenNow=()=>preview||core.isUnlocked(Date.now());
+ const arrivedLocked=!canOpenNow();
+ let unlockTransitionStarted=false;
  let opened=false, loading=false, audio=null, fadeFrame=0, lastTrigger=null;
  let language='fr', soundPreference='off', choicesMade=false, experienceStarted=false, loadedContent=null;
  const t=key=>global.BIRTHDAY_I18N[language][key];
@@ -40,6 +43,7 @@
  });
  $('welcome-form').addEventListener('submit',event=>{
   event.preventDefault();
+  if(!canOpenNow())return;
   const values=new FormData(event.currentTarget);
   if(!['fr','tr'].includes(values.get('language'))||!['on','off'].includes(values.get('sound')))return;
   applyLocale(values.get('language'));soundPreference=values.get('sound');choicesMade=true;
@@ -60,15 +64,18 @@
  const digits=$('countdown').querySelectorAll('strong');
  function tick(){
   if(opened)return;
-  // Vérification de l'heure temporairement désactivée pour tester le site.
-  // countdown(Date.now()).forEach((value,i)=>digits[i].textContent=String(value).padStart(2,'0'));
-  // if(preview || core.isUnlocked(Date.now())) openExperience();
-  openExperience();
+  countdown(Date.now()).forEach((value,i)=>digits[i].textContent=String(value).padStart(2,'0'));
+  if(canOpenNow())openExperience();
  }
  const clock=setInterval(tick,1000);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick();});
  function openExperience(){
-  if(opened||loading)return; loading=true;
+  if(!canOpenNow()||opened||loading)return; loading=true;
+  if(!unlockTransitionStarted){
+   unlockTransitionStarted=true;
+   const showWelcome=()=>{$('gate').hidden=true;$('welcome').hidden=false;};
+   if(arrivedLocked&&!reduced.matches){$('gate').classList.add('gate-opening');setTimeout(showWelcome,650);}else showWelcome();
+  }
   const script=document.createElement('script'); script.src='assets/content.js';
   script.onload=()=>{
    const content=global.BIRTHDAY_CONTENT;

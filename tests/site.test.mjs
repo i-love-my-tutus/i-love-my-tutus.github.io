@@ -15,6 +15,11 @@ test('Ouverture absolue, bornes exactes et décompte',()=>{
 test('Paris, Sofia et New York ouvrent au même instant',()=>{
  for(const instant of ['2026-10-08T23:59:00+03:00','2026-10-08T22:59:00+02:00','2026-10-08T16:59:00-04:00'])assert.equal(Date.parse(instant),core.UNLOCK_AT);
 });
+test('Le mode aperçu est réservé aux adresses locales',()=>{
+ for(const hostname of ['localhost','127.0.0.1','[::1]',''])assert.equal(core.isLocalPreview(hostname,'?preview=true'),true);
+ for(const hostname of ['i-love-my-tutus.github.io','example.com','localhost.example.com'])assert.equal(core.isLocalPreview(hostname,'?preview=true'),false);
+ assert.equal(core.isLocalPreview('localhost',''),false);
+});
 test('Contenu intégral, caractères et chemins des photos',async()=>{
  const context={window:{}};vm.runInNewContext(await fs.readFile('assets/content.js','utf8'),context);
  const content=context.window.BIRTHDAY_CONTENT;
@@ -63,4 +68,16 @@ test('Traduction turque complète et dictionnaires sans clés manquantes',async(
  assert.deepEqual(Object.keys(dictionaries.fr).sort(),Object.keys(dictionaries.tr).sort());
  const html=await fs.readFile('index.html','utf8');
  for(const [,key] of html.matchAll(/data-i18n(?:-aria|-lines)?="([^"]+)"/g))for(const lang of ['fr','tr'])assert.ok(typeof dictionaries[lang][key]==='string'&&dictionaries[lang][key].length,`${lang}/${key}`);
+});
+test('Publication unique depuis main et fichiers statiques prêts à la racine',async()=>{
+ let workflows=[];try{workflows=(await fs.readdir('.github/workflows')).filter(file=>/\.ya?ml$/.test(file));}catch(error){if(error.code!=='ENOENT')throw error;}
+ assert.deepEqual(workflows,[],'Aucun workflow concurrent à la publication automatique Pages');
+ await fs.access('.nojekyll');
+ const ignore=await fs.readFile('.gitignore','utf8');
+ assert.ok(!ignore.includes('assets/content.js')&&!ignore.includes('assets/photos/'));
+ assert.deepEqual(await fs.readFile('assets/content.js'),await fs.readFile('dist/assets/content.js'));
+ for(const file of await fs.readdir('assets/photos'))assert.deepEqual(await fs.readFile(`assets/photos/${file}`),await fs.readFile(`dist/assets/photos/${file}`),file);
+ const html=await fs.readFile('index.html','utf8');
+ assert.ok(/<section id="welcome"[^>]*\bhidden\b/.test(html));
+ assert.ok(!/<section id="gate"[^>]*\bhidden\b/.test(html));
 });

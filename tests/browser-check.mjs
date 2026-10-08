@@ -4,10 +4,12 @@ import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-const root=path.resolve('dist');
+const root=path.resolve('.');
+const requestedPaths=[];
 const server=http.createServer(async(req,res)=>{
  try{
-  const prefix='/tutus-birthday/';const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+  const prefix='/i-love-my-tutus/';const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+  requestedPaths.push(pathname);
   if(!pathname.startsWith(prefix))throw Error('Chemin inconnu');
   const file=path.resolve(root,pathname.slice(prefix.length)||'index.html');
   if(!file.startsWith(root+path.sep))throw Error('Chemin hors site');
@@ -30,6 +32,7 @@ try{
  const send=(method,params={})=>new Promise((resolve,reject)=>{const key=++id;const timer=setTimeout(()=>reject(new Error(`Délai CDP : ${method}`)),10000);pending.set(key,{resolve:r=>{clearTimeout(timer);resolve(r);},reject:e=>{clearTimeout(timer);reject(e);}});socket.send(JSON.stringify({id:key,method,params}));});
  const evaluate=async expression=>{const result=await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true,userGesture:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));return result.result.value;};
  await send('Runtime.enable');await send('Page.enable');await send('Network.enable');
+ const frozenClock=await send('Page.addScriptToEvaluateOnNewDocument',{source:'Date.now=()=>globalThis.__testNow ?? Date.parse("2026-10-08T20:58:59Z");'});
  await send('Page.addScriptToEvaluateOnNewDocument',{source:`
   const OriginalAudio=window.Audio;
   window.Audio=function(...args){
@@ -39,14 +42,35 @@ try{
    return audio;
   };
  `});
- const url=`http://127.0.0.1:${server.address().port}/tutus-birthday/`;
+ const url=`http://127.0.0.1:${server.address().port}/i-love-my-tutus/`;
  const waitFor=async(expression,label)=>{for(let i=0;i<80;i++){if(await evaluate(expression))return;await new Promise(r=>setTimeout(r,100));}const audioState=await evaluate('window.__testAudio ? {paused:__testAudio.paused,volume:__testAudio.volume,time:__testAudio.currentTime,ready:__testAudio.readyState,error:__testAudio.error?.code,visibility:document.visibilityState} : null');assert.fail(`${label}: ${JSON.stringify(audioState)}`);};
  const choose=async(language,sound)=>{
   await evaluate(`document.querySelector('input[name="language"][value="${language}"]').click();document.querySelector('input[name="sound"][value="${sound}"]').click();document.getElementById('start').click()`);
   await waitFor('!document.getElementById("experience").hidden','Expérience après confirmation');
  };
  await send('Emulation.setDeviceMetricsOverride',{width:375,height:812,deviceScaleFactor:1,mobile:true});
- await send('Page.navigate',{url:`${url}?preview=true`});
+ await send('Page.navigate',{url});
+ await waitFor('document.getElementById("countdown") && document.querySelectorAll("#countdown strong").length===4','Teaser chargé');
+ assert.equal(await evaluate('document.getElementById("gate").hidden'),false,'Compte à rebours avant ouverture');
+ assert.equal(await evaluate('document.getElementById("welcome").hidden'),true,'Aucun choix avant ouverture');
+ assert.equal(await evaluate('document.getElementById("experience").hidden'),true,'Aucune lettre avant ouverture');
+ assert.equal(await evaluate('typeof BIRTHDAY_CONTENT'),'undefined','Contenu privé non chargé');
+ assert.equal(await evaluate('typeof window.__testAudio'),'undefined','Aucun audio avant ouverture');
+ for(const timezoneId of ['Europe/Paris','Europe/Sofia','America/New_York']){
+  await send('Emulation.setTimezoneOverride',{timezoneId});
+  assert.deepEqual(await evaluate('[...document.querySelectorAll("#countdown strong")].map(el=>Number(el.textContent))'),[0,0,0,1],timezoneId);
+ }
+ for(const width of [320,375,430,768,1440]){
+  await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<700});
+  assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true,`Teaser ${width}px`);
+ }
+ assert.equal(requestedPaths.some(p=>/assets\/(content\.js|photos\/|audio\/)/.test(p)),false,'Aucune requête privée avant l’heure');
+ await evaluate('globalThis.__testNow=Date.parse("2026-10-08T20:59:00Z")');
+ await waitFor('!document.getElementById("welcome").hidden','Passage automatique à l’accueil, sans rechargement');
+ assert.equal(await evaluate('document.getElementById("gate").hidden'),true);
+ assert.equal(await evaluate('document.getElementById("experience").hidden'),true,'Les choix restent demandés');
+ await send('Page.removeScriptToEvaluateOnNewDocument',{identifier:frozenClock.identifier});
+ await send('Page.addScriptToEvaluateOnNewDocument',{source:'Date.now=()=>Date.parse("2026-10-08T20:59:01Z");'});
  await waitFor('window.__testAudio!==undefined','Contenu prêt avant le choix');
  assert.equal(await evaluate('document.getElementById("welcome").hidden'),false,'Choix à l’ouverture');
  assert.equal(await evaluate('document.getElementById("experience").hidden'),true,'Lettre cachée avant le choix');
@@ -164,7 +188,6 @@ try{
  await evaluate('dispatchEvent(new PageTransitionEvent("pageshow",{persisted:true}))');
  await waitFor('document.getElementById("welcome") && !document.getElementById("welcome").hidden && document.getElementById("experience").hidden','Choix après retour depuis le cache');
  assert.equal(await evaluate('document.querySelectorAll("#welcome-form input:checked").length'),0,'Choix remis à zéro');
- // Le contrôle horaire est actuellement commenté à la demande de l'utilisateur.
  assert.equal(exceptions.length,0,JSON.stringify(exceptions));
- console.log('Edge : choix obligatoires à chaque ouverture, silence avant accord et sans musique, français/turc intégral et interface traduite, police locale, MP3/fondu/pause/relecture, 21 images, 5 largeurs dans les deux langues et à l’accueil, zoom 200 %, clavier/focus, reduced-motion, erreurs traduites/réessai et zéro exception : OK.');
+ console.log('Edge : teaser seul avant 20:59 UTC, 3 fuseaux, zéro requête privée avant l’heure, ouverture automatique sans rechargement, /i-love-my-tutus/, choix français/turc et musique, police/MP3/21 images, 5 largeurs, zoom 200 %, clavier/focus, erreurs/réessai, zéro exception : OK.');
 }finally{socket?.close();browser.kill();server.closeAllConnections();server.close();}

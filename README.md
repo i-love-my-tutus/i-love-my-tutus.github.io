@@ -2,11 +2,11 @@
 
 Site d’anniversaire **HTML, CSS et JavaScript pur**, violet nuit et lavande. Aucun framework, service tiers, tracker ni serveur à héberger. Le navigateur charge uniquement des fichiers statiques. Les titres, citations et la lettre utilisent **Edu QLD Hand**, hébergée localement dans `assets/fonts/`, avec sa licence OFL. Les contrôles et petites indications conservent la police système.
 
-Le contrôle horaire est actuellement commenté dans `app.js` pour les tests. À chaque ouverture, un écran demande **Français ou Türkçe**, puis **avec ou sans musique**. Les deux choix doivent être confirmés pour entrer dans la lettre ; ils ne sont jamais sauvegardés. La musique démarre uniquement après accord sur cet écran, avec un fondu doux. Si le navigateur la bloque, le bouton musique ou un nouveau geste permet de la lancer. Choisir sans musique laisse toute l’expérience silencieuse, sauf si la visiteuse décide ensuite d’activer le bouton.
+Avant le **8 octobre 2026 à 23:59 en Bulgarie**, seule la page romantique avec son compte à rebours apparaît. À l’heure cible, elle laisse automatiquement place au choix **Français ou Türkçe**, puis **avec ou sans musique**, sans rechargement ni nouveau déploiement. Les deux choix doivent être confirmés pour entrer dans la lettre ; ils ne sont jamais sauvegardés. La musique démarre uniquement après accord sur cet écran, avec un fondu doux. Si le navigateur la bloque, le bouton musique ou un nouveau geste permet de la lancer.
 
 ## Ouvrir et préparer le site
 
-Les 20 photos sont préparées localement en trois tailles, sans métadonnées EXIF/GPS. Le message français est généré depuis `message.txt`, sans correction ni copie manuelle. La traduction turque complète vient de `message.tr.txt`, avec le même ordre et le même nombre de paragraphes. Titres, boutons, indications, textes alternatifs et erreurs sont traduits via `i18n.js`. Aucun service externe de traduction n’est utilisé. Les originaux restent en dehors de `dist/`.
+Les 20 photos sont préparées localement en trois tailles, sans métadonnées EXIF/GPS. Le message français est généré depuis `message.txt`, sans correction ni copie manuelle. La traduction turque complète vient de `message.tr.txt`, avec le même ordre et le même nombre de paragraphes. Titres, boutons, indications, textes alternatifs et erreurs sont traduits via `i18n.js`. Aucun service externe de traduction n’est utilisé. Les originaux restent en dehors de `dist/`. Les images optimisées et `assets/content.js` sont versionnés pour la publication depuis la racine de `main`.
 
 Sous Windows avec Node.js installé :
 
@@ -21,19 +21,22 @@ Ouvrir `dist/index.html` dans le navigateur, ou `index.html` après la préparat
 
 ## Publier sur GitHub Pages
 
-Le workflow `.github/workflows/pages.yml` prépare et publie uniquement `dist/`. Il s’exécute après un push sur `main`, ou manuellement depuis **Actions → Publier le site anniversaire → Run workflow**.
+Une seule méthode est conservée : la publication automatique GitHub Pages depuis **`main` → `/ (root)`**. Le réglage distant existant est `build_type: legacy`, avec cette branche et ce dossier. Cette méthode fonctionne sans accès administrateur pour changer les réglages. Le workflow personnalisé `.github/workflows/pages.yml`, qui échouait volontairement avant l’heure, est supprimé ; aucun deuxième workflow de publication n’est ajouté.
 
-1. Envoyer les fichiers du projet dans ton dépôt GitHub, avec `message.txt`, `message.tr.txt` et `images/` nécessaires à la préparation.
-2. Dans le dépôt, ouvrir **Settings → Pages → Source → GitHub Actions**.
-3. Après l’heure d’ouverture, lancer le workflow (ou pousser sur `main`). L’URL sera affichée par le job de publication. Pour ce dépôt, l’adresse attendue est `https://moqim-ghizlan.github.io/tutus-birthday/` ; elle n’est active qu’après une publication réussie.
+1. Après une modification des sources, lancer `npm.cmd run build` puis `npm.cmd test` localement.
+2. Committer les changements **avec `assets/content.js`, `assets/photos/`, la musique et les polices**. Ces fichiers générés sont désormais suivis par Git ; `dist/` reste ignoré.
+3. Pousser sur `main`. GitHub lance automatiquement **pages build and deployment** pour publier la racine du dépôt. Le fichier `.nojekyll` permet de servir les fichiers statiques tels quels.
+4. Consulter `https://i-love-my-tutus.github.io/i-love-my-tutus/`. Cette adresse est publique ; avant l’heure, elle montre le compte à rebours.
 
-Le workflow **refuse de publier avant le 8 octobre 2026 à 20:59 UTC**. Il faut le relancer après l’heure : aucune programmation automatique à la seconde n’est promise. Aucun push ni déploiement n’a été effectué par l’agent. Pour publier manuellement ailleurs, envoyer seulement le contenu de `dist/` : pas de commande ni serveur en production. Les chemins relatifs fonctionnent sous `/tutus-birthday/`.
+La publication peut réussir **avant l’heure** : le verrou est géré par le navigateur. Aucun job ne doit attendre le 8 octobre ou échouer à cause de la date. Les anciens runs du workflow supprimé peuvent rester visibles dans l’historique d’Actions, mais ne se déclenchent plus sur les prochains pushs. Ne pas réintroduire un workflow `deploy-pages` en parallèle de la publication depuis la branche. Tous les chemins restent relatifs et sont testés sous **`/i-love-my-tutus/`**, y compris les images, la musique, la police et le script de contenu. Pour un autre hébergement, envoyer seulement le contenu de `dist/`.
 
 ## Ouverture et confidentialité
 
-Instant d’ouverture prévu : **8 octobre 2026 à 23:59 Sofia = 22:59 Paris = `2026-10-08T20:59:00Z`**. Le contrôle horaire est actuellement commenté pour les tests : l’accueil est disponible immédiatement et le contenu local se prépare en arrière-plan. La lettre n’apparaît qu’après confirmation de la langue et du choix de musique. Ni l’état de déverrouillage, ni la langue, ni le choix de musique ne sont enregistrés dans le navigateur.
+Instant absolu d’ouverture : **8 octobre 2026 à 23:59 Sofia = 22:59 Paris = `2026-10-08T20:59:00Z`**. Avant cet instant, seul le teaser apparaît et le navigateur ne demande ni `assets/content.js`, ni les photos, ni le MP3. À partir de cet instant, il charge automatiquement le contenu et affiche le choix de langue et de musique. Une visite plus tardive mène directement aux choix. Ni l’état de déverrouillage, ni la langue, ni le choix de musique ne sont enregistrés dans le navigateur.
 
-**Le compte à rebours côté navigateur est cosmétique, pas un embargo sécurisé.** L’heure de l’appareil peut être modifiée et les URL des fichiers publiés restent récupérables. GitHub Pages rend les médias déployés publics. Un dépôt public expose aussi `message.txt` et les photos originales dès le push, même sans Pages. Garder le dépôt privé si l’offre GitHub permet Pages privé-source, ou ne pousser les fichiers privés qu’après l’ouverture. Le refus de publication du workflow évite un déploiement anticipé via ce workflow, mais ne protège ni les sources d’un dépôt public, ni les déploiements manuels.
+**Le compte à rebours côté navigateur est cosmétique, pas un embargo sécurisé.** L’heure de l’appareil peut être modifiée et les URL des fichiers publiés restent récupérables. La publication depuis la racine de la branche sert aussi les fichiers sources présents dans ce dossier ; le dépôt public expose le message et les originaux dès le push. Les images optimisées sont sans EXIF, mais cela ne retire pas les métadonnées des originaux publics.
+
+Pour un véritable embargo, publier seulement le teaser maintenant et conserver le message, les photos et le MP3 hors du dépôt public jusqu’à l’heure. Il faudra alors un deuxième déploiement pour les ajouter. Pour conserver une seule publication et obtenir un embargo réel, servir les contenus privés depuis un serveur/edge qui les refuse avant l’heure selon une horloge serveur fiable. GitHub Pages seul ne peut pas fournir cette protection.
 
 Les textes et photos ne sont envoyés à aucune API par les scripts. Le workflow les transmet à GitHub uniquement lorsque tu choisis de pousser et de publier le projet. `noindex` décourage l’indexation sans garantir la confidentialité.
 
@@ -46,7 +49,7 @@ Les textes et photos ne sont envoyés à aucune API par les scripts. Le workflow
 
 ## Vérifications
 
-`npm test` vérifie les bornes de l’ouverture, les fuseaux, le décompte, les deux messages intégraux UTF-8 et leurs paragraphes, les clés de traduction, l’inventaire des photos, les chemins relatifs, la copie fidèle du MP3, l’absence d’EXIF dans les JPEG optimisés et la correspondance entre les sources et `dist`.
+`npm test` vérifie les bornes de l’ouverture, les fuseaux, le décompte, le mode aperçu limité aux adresses locales, les deux messages intégraux UTF-8 et leurs paragraphes, les clés de traduction, l’inventaire des photos, les chemins relatifs, la copie fidèle du MP3, l’absence d’EXIF dans les JPEG optimisés, la correspondance entre les sources et `dist` et l’absence de workflow de publication concurrent.
 
-`npm run test:browser` vérifie dans Edge sous Windows : choix obligatoires à chaque ouverture et rechargement ; silence avant accord et après choix sans musique ; lettres française et turque complètes, interface et erreurs traduites ; police locale ; hébergement dans un sous-répertoire comme GitHub Pages ; lecture du vrai MP3, fondu et pause ; relecture sans redémarrage du morceau ; décodage des 21 images affichées ; largeurs 320, 375, 430, 768 et 1440 px pour l’accueil et les deux langues ; texte agrandi à 200 % ; bouton final au clavier et cible tactile ; lightbox, Échap et retour du focus ; mode lecture ; reduced-motion ; repli d’une photo manquante ; récupération du contenu avec Réessayer après un chargement bloqué. Les contrôles ont réussi sans exception JavaScript. Le scroll reste natif, sans sections bloquées.
+`npm run test:browser` vérifie dans Edge sous Windows : teaser seul avant l’heure dans trois fuseaux ; aucune requête de contenu, photo ou musique avant l’heure ; ouverture automatique avec horloge simulée, sans rechargement ; chemins sous `/i-love-my-tutus/` ; choix obligatoires à chaque ouverture ; silence avant accord ; français/turc intégraux ; police locale ; vrai MP3, fondu et pause ; relecture ; décodage des 21 images ; largeurs 320, 375, 430, 768 et 1440 px ; texte à 200 % ; clavier/focus ; reduced-motion ; photo manquante et récupération après un échec de chargement. Le design et les animations existants sont conservés.
 # i-love-my-tutus
